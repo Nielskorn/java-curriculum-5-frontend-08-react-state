@@ -12,15 +12,34 @@ characters.push(char);
 export default function MainPage(){
 
     const [page,setPage]=useState<number>(1)
+    let enabledP:boolean
+    let enabledN:boolean
     function  updatePage(nr:number){
-        setPage(nr)
+        if(page>=1){
+        setPage(nr)}
     }
     const [data, setData]=useState<Character[]>([])
     function fetchData() {
-        axios.get("https://rickandmortyapi.com/api/character",{params:{page:page}}).then(response=>{setData(response.data.results)}).catch(error=>console.log(error)
+        axios.get("https://rickandmortyapi.com/api/character",{params:{page:page}}).then(response=>{setData(response.data.results)
+        enableCheck(response.data.info)
+        }).catch(error=>console.log(error)
 
         )
         
+    }
+    function enableCheck(info){
+        console.log(info)
+        if(info.prev==null){
+            enabledP=false
+            enabledN=true
+        }else if(info.next==null){
+            enabledN=false
+            enabledP=true
+        }
+        else {
+            enabledP=true
+            enabledN=true
+        }
     }
 
     useEffect(() => {
@@ -40,8 +59,8 @@ export default function MainPage(){
             filteredCharacters.length > 0
                 ? <div>
                 <CharacterGallery characters={filteredCharacters}/>
-                <button onClick={()=>updatePage(page+1)}> next </button>
-                <button onClick={()=>updatePage(page-1)}>previous </button>
+                <button onClick={()=>updatePage(page+1)}disabled={enabledN}> next </button>
+                <button onClick={()=>updatePage(page-1)  }disabled={enabledP}>previous </button>
                 </div>
 : <p>No characters found</p>
 }
