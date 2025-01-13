@@ -1,20 +1,48 @@
 import CharacterGallery from "./CharacterGallery.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {characters} from "../Characters.ts";
 import {Character} from "../types/RickAndMortyCharacter.ts";
+import  axios from "axios";
+import {Simulate} from "react-dom/test-utils";
+import error = Simulate.error;
+
 export function addCharacter(char:Character){
 characters.push(char);
 }
 export default function MainPage(){
+
+    const [page,setPage]=useState<number>(1)
+    function  updatePage(nr:number){
+        setPage(nr)
+    }
+    const [data, setData]=useState<Character[]>([])
+    function fetchData() {
+        axios.get("https://rickandmortyapi.com/api/character",{params:{page:page}}).then(response=>{setData(response.data.results)}).catch(error=>console.log(error)
+
+        )
+        
+    }
+
+    useEffect(() => {
+        fetchData()
+    }, [page])
+
+   //
+
+    //useEffect(()=>{fetchData},[])
     const [searchText, setSearchText] = useState("");
 
-    const filteredCharacters = characters
-        .filter((character) => character.name.toLowerCase().includes(searchText.toLowerCase()));
+    //console.log(data)
+    const filteredCharacters:Character[] = data.filter((character) => character.name.toLowerCase().includes(searchText.toLowerCase()));
     return    <>
         <input type="text" onChange={(e) => setSearchText(e.target.value)} placeholder="Search for a character"/>
         {
             filteredCharacters.length > 0
-                ? <CharacterGallery characters={filteredCharacters}/>
+                ? <div>
+                <CharacterGallery characters={filteredCharacters}/>
+                <button onClick={()=>updatePage(page+1)}> next </button>
+                <button onClick={()=>updatePage(page-1)}>previous </button>
+                </div>
 : <p>No characters found</p>
 }
     </>
