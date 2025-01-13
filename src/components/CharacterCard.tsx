@@ -1,6 +1,7 @@
 import {Character} from "../types/RickAndMortyCharacter.ts";
 import "./CharacterCard.css";
 
+
 type CharacterCardProps = {
     character: Character;
 }
